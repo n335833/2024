@@ -1,0 +1,45 @@
+Sub ReadExcelToRecordset()
+    Dim conn As Object
+    Dim rs As Object
+    Dim strConn As String
+    Dim strSQL As String
+    Dim db As DAO.Database
+    Dim rstAccess As DAO.Recordset
+    
+    ' 定義 Excel 的連線字串
+    strConn = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\path\to\file.xls;Extended Properties='Excel 8.0;HDR=YES;'"
+
+    ' 建立 ADO 連線
+    Set conn = CreateObject("ADODB.Connection")
+    conn.Open strConn
+
+    ' 定義 SQL 查詢語句
+    ' 假設 Excel 檔案中工作表名稱為 Sheet1
+    strSQL = "SELECT * FROM [Sheet1$]"
+
+    ' 執行 SQL 並將結果存入 ADO Recordset
+    Set rs = CreateObject("ADODB.Recordset")
+    rs.Open strSQL, conn, 1, 1  ' 1 = adOpenKeyset, 1 = adLockReadOnly
+
+    ' 將 Recordset 資料匯入 Access 資料表
+    Set db = CurrentDb
+    Set rstAccess = db.OpenRecordset("YourAccessTableName", dbOpenDynaset)
+    
+    Do While Not rs.EOF
+        rstAccess.AddNew
+        rstAccess!FieldName1 = rs!ExcelColumn1  ' 替換為您的 Access 與 Excel 欄位名稱
+        rstAccess!FieldName2 = rs!ExcelColumn2
+        rstAccess.Update
+        rs.MoveNext
+    Loop
+
+    ' 關閉物件
+    rs.Close
+    conn.Close
+    rstAccess.Close
+    Set rs = Nothing
+    Set conn = Nothing
+    Set rstAccess = Nothing
+
+    MsgBox "資料匯入完成！"
+End Sub
