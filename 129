@@ -1,0 +1,36 @@
+Dim cnn As ADODB.Connection
+Dim cmd As ADODB.Command
+
+On Error GoTo ErrorHandler
+
+' 初始化物件
+Set cnn = New ADODB.Connection
+Set cmd = New ADODB.Command
+
+' 設定連線字串並開啟連線
+cnn.ConnectionString = [connstr]
+cnn.Open
+
+' 設定 Command 物件
+With cmd
+    .ActiveConnection = cnn
+    .CommandType = adCmdText
+    .CommandText = [sql]
+    .Execute
+End With
+
+Cleanup:
+    ' 關閉並釋放資源
+    If Not cmd Is Nothing Then
+        Set cmd = Nothing
+    End If
+    
+    If Not cnn Is Nothing Then
+        If cnn.State = adStateOpen Then cnn.Close
+        Set cnn = Nothing
+    End If
+    Exit Sub
+
+ErrorHandler:
+    MsgBox "Error: " & Err.Description, vbExclamation
+    Resume Cleanup
