@@ -1,0 +1,46 @@
+' RecordsetManager Class Module
+Private m_rst As ADODB.Recordset
+
+' 初始化 Recordset
+Public Sub Open(sql As String, cnnStr As String)
+    Dim cnn As ADODB.Connection
+    Dim cmd As ADODB.Command
+
+    ' 初始化連線和命令物件
+    Set cnn = New ADODB.Connection
+    Set cmd = New ADODB.Command
+    Set m_rst = New ADODB.Recordset
+
+    ' 開啟連線
+    cnn.ConnectionString = cnnStr
+    cnn.Open
+
+    ' 設定命令
+    With cmd
+        .ActiveConnection = cnn
+        .CommandType = adCmdText
+        .CommandText = sql
+    End With
+
+    ' 開啟 Recordset
+    m_rst.CursorLocation = adUseClient ' 獨立記憶體的游標
+    m_rst.Open cmd, , adOpenStatic, adLockReadOnly
+
+    ' 釋放 Connection 和 Command，但保留 Recordset
+    cnn.Close
+    Set cnn = Nothing
+    Set cmd = Nothing
+End Sub
+
+' 提供 Recordset 的存取方法
+Public Property Get Recordset() As ADODB.Recordset
+    Set Recordset = m_rst
+End Property
+
+' 自動釋放資源
+Private Sub Class_Terminate()
+    If Not m_rst Is Nothing Then
+        If m_rst.State = adStateOpen Then m_rst.Close
+        Set m_rst = Nothing
+    End If
+End Sub
