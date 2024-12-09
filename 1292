@@ -1,0 +1,21 @@
+Sub TestWithRst()
+    Dim manager As RecordsetManager
+    Dim sql As String
+    Dim cnnStr As String
+
+    ' 定義查詢與連線字串
+    sql = "SELECT * FROM YourTableName"
+    cnnStr = "Provider=SQLOLEDB;Data Source=YourServerName;Initial Catalog=YourDatabaseName;Integrated Security=SSPI;"
+
+    ' 使用 RecordsetManager
+    Set manager = New RecordsetManager
+    manager.Open sql, cnnStr
+
+    ' 使用 With 來處理 Recordset
+    With manager.Recordset
+        Do While Not .EOF
+            Debug.Print .Fields(0).Value
+            .MoveNext
+        Loop
+    End With ' 此處 Recordset 自動釋放資源
+End Sub
