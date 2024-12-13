@@ -1,0 +1,24 @@
+Function ConvertBig5ToUnicode(input As String) As String
+    Dim shellCommand As String
+    Dim output As String
+    Dim tempFile As String
+
+    ' 創建臨時檔案來存儲輸出
+    tempFile = Environ("TEMP") & "\output.txt"
+
+    ' 構建 Shell 指令
+    shellCommand = "cmd.exe /c ""C:\Path\To\Big5ToUnicode.exe """ & input & """ > """ & tempFile & """"
+
+    ' 執行程式
+    Shell shellCommand, vbHide
+
+    ' 讀取結果
+    Dim fileNumber As Integer
+    fileNumber = FreeFile
+    Open tempFile For Input As fileNumber
+    Line Input #fileNumber, output
+    Close fileNumber
+
+    ' 返回結果
+    ConvertBig5ToUnicode = output
+End Function
