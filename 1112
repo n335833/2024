@@ -1,0 +1,22 @@
+using System;
+using System.Text;
+
+namespace EncodingConverter
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            if (args.Length > 0)
+            {
+                string input = args[0];
+                Encoding big5 = Encoding.GetEncoding("big5");
+                Encoding unicode = Encoding.Unicode;
+                byte[] big5Bytes = big5.GetBytes(input);
+                byte[] unicodeBytes = Encoding.Convert(big5, unicode, big5Bytes);
+                string output = unicode.GetString(unicodeBytes);
+                Console.WriteLine(output);
+            }
+        }
+    }
+}
