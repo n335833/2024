@@ -1,0 +1,15 @@
+Dim converter As Object
+Set converter = CreateObject("System.Runtime.InteropServices.RuntimeEnvironment")
+
+' 使用反射加載 DLL
+Dim assembly As Object
+Set assembly = converter.LoadFrom("C:\Path\To\Big5ToUnicode.dll")
+
+' 獲取方法
+Dim converterClass As Object
+Set converterClass = assembly.CreateInstance("EncodingConverter.Converter")
+
+' 調用方法
+Dim result As String
+result = converterClass.ConvertBig5ToUnicode("測試文字")
+MsgBox result
