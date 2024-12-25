@@ -1,0 +1,5 @@
+@echo off
+set "BackupDirectory=C:\Backup"
+for /F "skip=7 delims=" %%D in ('dir "%BackupDirectory%" /AD /B /O-D 2^>nul') do (
+    rd /Q /S "%BackupDirectory%\%%D"
+)
