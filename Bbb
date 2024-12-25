@@ -1,0 +1,51 @@
+@echo off
+setlocal enabledelayedexpansion
+
+:: 设置目标目录
+set "target_dir=C:\logs"
+
+:: 获取当前日期
+for /f "tokens=2 delims==." %%a in ('wmic os get localdatetime /value ^| find "="') do set datetime=%%a
+set year=%datetime:~0,4%
+set month=%datetime:~4,2%
+set day=%datetime:~6,2%
+
+:: 将当前日期转换为总天数
+call :DateToDays %year% %month% %day% today_total_days
+
+:: 遍历目标目录中的文件
+for %%f in ("%target_dir%\*") do (
+    if not "%%~ff" == "" (
+        :: 获取文件的修改日期
+        for /f "skip=5 tokens=1,2 delims= " %%a in ('dir /tc "%%f"') do (
+            set filedate=%%a
+            goto :process_file
+        )
+        :process_file
+        set fileyear=!filedate:~0,4!
+        set filemonth=!filedate:~5,2!
+        set fileday=!filedate:~8,2!
+        
+        :: 将文件日期转换为总天数
+        call :DateToDays !fileyear! !filemonth! !fileday! file_total_days
+
+        :: 计算日期差
+        set /a diff=%today_total_days% - !file_total_days!
+        if !diff! gtr 7 (
+            echo 删除文件: %%f
+            del "%%f"
+        )
+    )
+)
+
+echo 清理完成！
+pause
+exit
+
+:: 函数：将日期转换为总天数
+:DateToDays
+set /a year=%1, month=%2, day=%3
+if %month% lss 3 set /a year-=1, month+=12
+set /a total_days=(365 * %year% + %year% / 4 - %year% / 100 + %year% / 400 + (153 * %month% - 457) / 5 + %day% - 306)
+set %4=%total_days%
+exit /b
