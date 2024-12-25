@@ -1,0 +1,39 @@
+@echo off
+setlocal enabledelayedexpansion
+
+:: 设置目标目录
+set "target_dir=C:\logs"
+
+:: 获取当前日期
+for /f "tokens=2 delims==." %%a in ('wmic os get localdatetime /value ^| find "="') do set datetime=%%a
+set year=%datetime:~0,4%
+set month=%datetime:~4,2%
+set day=%datetime:~6,2%
+
+:: 转换当前日期为 "YYYYMMDD" 格式
+set today=%year%%month%%day%
+
+:: 遍历目标目录中的文件
+for %%f in ("%target_dir%\*") do (
+    :: 获取文件的修改日期
+    for /f "tokens=1,2 delims= " %%a in ('dir /tc "%%f" ^| findstr /c:"%%~nxf"') do (
+        set filedate=%%a
+        set filedate=!filedate:/=-!
+    )
+
+    :: 转换文件日期为 "YYYYMMDD" 格式
+    set fileyear=!filedate:~0,4!
+    set filemonth=!filedate:~5,2!
+    set fileday=!filedate:~8,2!
+    set filedate=!fileyear!!filemonth!!fileday!
+
+    :: 计算日期差（简单算法）
+    set /a diff=!today! - !filedate!
+    if !diff! gtr 7 (
+        echo 删除文件: %%f
+        del "%%f"
+    )
+)
+
+echo 清理完成！
+pause
