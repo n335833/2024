@@ -1,0 +1,1 @@
+Forfiles -p "C:\Work Data\Len's Files\Data\Quicken\BACKUP"  -s -m *.QDF-backup /D "-14" /C "cmd /c del /q @path"
